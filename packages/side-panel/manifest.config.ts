@@ -1,4 +1,4 @@
-import { defineManifest } from "@crxjs/vite-plugin";
+import { defineManifest } from '@crxjs/vite-plugin';
 import pkg from './package.json' assert { type: 'json' };
 
 export default defineManifest(async function (env) {
@@ -9,8 +9,12 @@ export default defineManifest(async function (env) {
       : 'Bulk ChatGPT',
     version: pkg.version,
     permissions: [
-      'sidePanel',
       'activeTab',
+      'scripting',
+      'sidePanel',
+    ],
+    host_permissions: [
+      'https://chat.openai.com/*',
     ],
     side_panel: {
       default_path: 'index.html',

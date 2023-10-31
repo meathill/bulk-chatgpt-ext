@@ -1,0 +1,22 @@
+{
+  "name": "bulk-chatgpt-ext",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint --fix --ext .js,.ts,.vue ."
+  },
+  "keywords": [],
+  "author": {
+    "name": "Meathill",
+    "email": "meathill@gmail.com"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "eslint": "^8.52.0",
+    "eslint-plugin-vue": "^9.18.1",
+    "vue-eslint-parser": "^9.3.2"
+  }
+}
