@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { setValueToInput } from './utils';
+import { setValueToInput, submitPrompt } from './utils';
 
 const prompt = ref<string>('');
 const isExecuting = ref<boolean>(false);
@@ -14,6 +14,7 @@ async function doSubmit(event: Event): Promise<void> {
     .filter(Boolean);
   for (const item of prompts) {
     await setValueToInput(item);
+    await submitPrompt();
   }
   isExecuting.value = false;
 }
