@@ -12,12 +12,20 @@ export default defineManifest(async function (env) {
       'activeTab',
       'scripting',
       'sidePanel',
+      'tabs',
     ],
     host_permissions: [
       'https://chat.openai.com/*',
     ],
     side_panel: {
       default_path: 'index.html',
+    },
+    background: {
+      'service_worker': 'src/sw.ts',
+      'type': 'module'
+    },
+    'action': {
+      'default_title': 'Click to open panel'
     },
   };
 });
