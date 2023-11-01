@@ -4,6 +4,7 @@ import { setValueToInput, submitPrompt } from './utils';
 
 const prompt = ref<string>('');
 const isExecuting = ref<boolean>(false);
+
 async function doSubmit(event: Event): Promise<void> {
   if ((event.target as HTMLFormElement).matches(':invalid')) return;
   if (isExecuting.value) return;

@@ -29,7 +29,7 @@ async function submitPromptByClickButton(): Promise<void> {
   }
 }
 
-export async function getActiveTab(): Promise<Tab> {
+export async function getActiveTab(): Promise<chrome.tabs.Tab> {
   const tabs = await chrome.tabs.query({
     active: true,
     currentWindow: true,
@@ -40,7 +40,7 @@ export async function getActiveTab(): Promise<Tab> {
 export async function setValueToInput(value: string): Promise<void> {
   const tab = await getActiveTab();
   await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
+    target: { tabId: tab.id as number },
     func: setValueToTextarea,
     args: ['#prompt-textarea', value],
   });
@@ -49,7 +49,7 @@ export async function setValueToInput(value: string): Promise<void> {
 export async function submitPrompt(): Promise<void> {
   const tab = await getActiveTab();
   await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
+    target: { tabId: tab.id as number },
     func: submitPromptByClickButton,
   });
 }
