@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import useStore from '@/store';
 
 type Props = {
   index: number;
-  modelValue: string;
   isExecuting?: boolean;
 };
 const props = defineProps<Props>();
 type Emits = {
-  (event: 'update:modelValue', value: string): void;
   (event: 'delete'): void;
 };
 const emit = defineEmits<Emits>();
 
+const store = useStore();
 const textarea = ref<HTMLTextAreaElement>();
 const prompt = computed<string>({
   get(): string {
-    return props.modelValue;
+    return store.prompts[props.index];
   },
   set(value: string): void {
-    emit('update:modelValue', value);
+    store.setPrompts(props.index, value);
   },
 });
 
@@ -30,12 +30,9 @@ function doRemove(): void {
   }
   emit('delete');
 }
-function focus(): void {
-  textarea.value?.focus();
-}
 
-defineExpose({
-  focus,
+onMounted(() => {
+  textarea.value?.focus();
 });
 </script>
 
@@ -46,7 +43,7 @@ defineExpose({
       :class="{'bg-base-200': isExecuting}"
     )
       i.bi.bi-play-fill(v-if="isExecuting")
-      template(v-else) {{index}}
+      template(v-else) {{index + 1}}
     button.btn.btn-xs.btn-ghost.btn-circle.mt-2(
       tabindex="-1"
       type="button"

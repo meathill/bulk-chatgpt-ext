@@ -1,9 +1,5 @@
-export type ExecuteMessage = {
-  id: number;
+export type PromptItem = {
+  id: string;
   prompt: string;
-}
-
-export type CallbackMessage = {
-  id: number;
-  message: string;
+  response: string;
 }
