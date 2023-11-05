@@ -1,29 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { setValueToInput, submitPrompt } from '@/utils';
+import { nextTick, ref } from 'vue';
+import { setValueToInput, submitPrompt } from '../services';
 import PromptItem from '@/components/prompt-item.vue';
 
 const LOCAL_KEY = 'local-prompts';
 const local = localStorage.getItem(LOCAL_KEY);
+const promptItems = ref<typeof PromptItem>();
 const prompts = ref<string[]>(local ? JSON.parse(local) : ['']);
-const isExecuting = ref<boolean>(false);
+const currentExecuting = ref<number>(-1);
 
-function doAddPrompt(): void {
+async function doAddPrompt(): Promise<void> {
   prompts.value.push('');
+  await nextTick();
+  if (!promptItems.value) return;
+  promptItems.value[promptItems.value.length - 1].focus();
 }
 async function doSubmit(event: Event): Promise<void> {
   if ((event.target as HTMLFormElement).matches(':invalid')) return;
-  if (isExecuting.value) return;
+  if (currentExecuting.value > -1) return;
 
-  isExecuting.value = true;
-  for (const item of prompts.value) {
+  for (let i = 0, len = prompts.value.length; i < len; i++) {
+    currentExecuting.value = i;
+    const item = prompts.value[i];
     const prompt = item.trim();
     if (!prompt) continue;
 
     await setValueToInput(item);
     await submitPrompt();
   }
-  isExecuting.value = false;
+  currentExecuting.value = -1;
 }
 function doClearAll(): void {
   if (!confirm('Are you sure you want to clear all prompts?')) return;
@@ -42,9 +47,10 @@ form.px-4.pt-4(
 )
   prompt-item(
     v-for="(item, index) in prompts"
+    ref="promptItems"
     :key="index"
     :index="index + 1"
-    :is-executing="isExecuting"
+    :is-executing="currentExecuting === index"
     v-model="prompts[index]"
     @delete="prompts.splice(index, 1)"
   )
@@ -63,9 +69,9 @@ form.px-4.pt-4(
       | Clear all
   .form-control
     button.btn.btn-primary(
-      :disabled="isExecuting"
+      :disabled="currentExecuting > -1"
     )
-      span.loading.loading-spinner(v-if="isExecuting")
+      span.loading.loading-spinner(v-if="currentExecuting > -1")
       i.bi.bi-play-fill(v-else)
       | Submit
 </template>

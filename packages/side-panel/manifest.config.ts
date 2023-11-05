@@ -14,6 +14,12 @@ export default defineManifest(async function (env) {
       'sidePanel',
       'tabs',
     ],
+    content_scripts: [
+      {
+        matches: ['https://chat.openai.com/*'],
+        js: ['./content/src/index.ts'],
+      },
+    ],
     host_permissions: [
       'https://chat.openai.com/*',
     ],
@@ -24,7 +30,7 @@ export default defineManifest(async function (env) {
       'service_worker': 'src/sw.ts',
       'type': 'module'
     },
-    'action': {
+    action: {
       'default_title': 'Click to open panel'
     },
   };

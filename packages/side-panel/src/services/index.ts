@@ -1,3 +1,16 @@
+import { CallbackMessage } from '@/types';
+
+const messageIndex = 0;
+const resolveMap: Record<string, (value: unknown) => void> = {};
+const rejectMap: Record<string, () => void> = {};
+
+chrome.runtime.onMessage.addListener((messageItem: CallbackMessage) => {
+  const { id, message } = messageItem;
+  resolveMap[id](message);
+  delete resolveMap[id];
+  delete rejectMap[id];
+});
+
 function setValueToTextarea(selector: string, value: string): void {
   const textarea = document.querySelector(selector) as HTMLTextAreaElement;
   textarea.focus();
@@ -6,27 +19,6 @@ function setValueToTextarea(selector: string, value: string): void {
   const event = new Event('input', { bubbles: true });
   textarea.dispatchEvent(event);
   console.log('[MuiBulk] setValueToTextarea', value, textarea.value);
-}
-
-async function submitPromptByClickButton(): Promise<void> {
-  function sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  const button = document.querySelector('[data-testid="send-button"]') as HTMLButtonElement;
-  button.click();
-  console.log('[MuiBulk] submit', button);
-  await sleep(1500);
-  const buttons = document.getElementsByTagName('button');
-  let timeout = 0;
-  while (timeout < 150000) { // 150s
-    const regenerate = Array.from(buttons).find((button) => button.innerText === 'Regenerate');
-    if (regenerate && regenerate.disabled === false) {
-      break;
-    }
-    await sleep(1000);
-    timeout += 1000;
-  }
 }
 
 export async function getActiveTab(): Promise<chrome.tabs.Tab> {
@@ -48,8 +40,8 @@ export async function setValueToInput(value: string): Promise<void> {
 
 export async function submitPrompt(): Promise<void> {
   const tab = await getActiveTab();
-  await chrome.scripting.executeScript({
-    target: { tabId: tab.id as number },
-    func: submitPromptByClickButton,
+  const result = await chrome.tabs.sendMessage(tab.id as number, {
+    type: 'ExecutePrompt',
   });
+  console.log('[MuiBulk]', result);
 }

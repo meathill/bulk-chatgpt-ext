@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 type Props = {
   index: number;
@@ -13,6 +13,7 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 
+const textarea = ref<HTMLTextAreaElement>();
 const prompt = computed<string>({
   get(): string {
     return props.modelValue;
@@ -29,12 +30,23 @@ function doRemove(): void {
   }
   emit('delete');
 }
+function focus(): void {
+  textarea.value?.focus();
+}
+
+defineExpose({
+  focus,
+});
 </script>
 
 <template lang="pug">
 .flex.gap-2.mb-2
-  .w-6.flex-none.pt-2
-    .border.rounded-full.w-6.h-6.flex.justify-center.items-center.border-base-content {{index}}
+  .w-6.flex-none.pt-1
+    .border.rounded-full.w-6.h-6.flex.justify-center.items-center.border-base-content(
+      :class="{'bg-base-200': isExecuting}"
+    )
+      i.bi.bi-play-fill(v-if="isExecuting")
+      template(v-else) {{index}}
     button.btn.btn-xs.btn-ghost.btn-circle.mt-2(
       tabindex="-1"
       type="button"
@@ -43,6 +55,7 @@ function doRemove(): void {
       i.bi.bi-x-lg
   .flex-1
     textarea.textarea.textarea-bordered.w-full.leading-normal.pt-2(
+      ref="textarea"
       rows="4"
       required
       placeholder="Type here"
