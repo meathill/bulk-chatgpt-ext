@@ -27,10 +27,11 @@ async function doOpen(): Promise<void> {
 function doReplace(): void {
   for (let i = 0, len = store.prompts.length; i < len; i++) {
     const item = store.prompts[i];
-    const prompt = item.trim();
+    let prompt = item.prompt.trim();
     if (!prompt) continue;
 
-    store.setPrompts(i, prompt.replaceAll(toFind.value, toReplace.value));
+    prompt = prompt.replaceAll(toFind.value, toReplace.value);
+    store.setPrompt(i, { prompt });
   }
   dialog.value?.close();
 }

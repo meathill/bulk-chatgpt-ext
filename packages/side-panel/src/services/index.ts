@@ -1,15 +1,6 @@
-import { CallbackMessage } from '@/types';
+import TurndownService from 'turndown';
 
-const messageIndex = 0;
-const resolveMap: Record<string, (value: unknown) => void> = {};
-const rejectMap: Record<string, () => void> = {};
-
-chrome.runtime.onMessage.addListener((messageItem: CallbackMessage) => {
-  const { id, message } = messageItem;
-  resolveMap[id](message);
-  delete resolveMap[id];
-  delete rejectMap[id];
-});
+const turndownService = new TurndownService();
 
 function setValueToTextarea(selector: string, value: string): void {
   const textarea = document.querySelector(selector) as HTMLTextAreaElement;
@@ -38,10 +29,10 @@ export async function setValueToInput(value: string): Promise<void> {
   });
 }
 
-export async function submitPrompt(): Promise<void> {
+export async function submitPrompt(): Promise<string> {
   const tab = await getActiveTab();
   const result = await chrome.tabs.sendMessage(tab.id as number, {
     type: 'ExecutePrompt',
   });
-  console.log('[MuiBulk]', result);
+  return turndownService.turndown(result as string);
 }

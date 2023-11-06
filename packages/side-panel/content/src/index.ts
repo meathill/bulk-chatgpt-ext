@@ -1,4 +1,4 @@
-import { ExecuteMessage } from '../../src/types';
+import { PromptRequest } from '../../src/types';
 
 console.log('[MuiBulk content] init');
 
@@ -7,8 +7,9 @@ function sleep(ms: number): Promise<void> {
 }
 
 chrome.runtime.onMessage.addListener(
-  function (request: ExecuteMessage, sender, sendResponse) {
-    const { id, prompt } = request;
+  function (request: PromptRequest, sender, sendResponse) {
+    console.log(sender.url);
+    if (request.type !== 'ExecutePrompt') { return; }
 
     const button = document.querySelector('[data-testid="send-button"]') as HTMLButtonElement;
     button.click();
@@ -28,10 +29,14 @@ chrome.runtime.onMessage.addListener(
       }
 
       console.log('[MuiBulk content] done');
-      sendResponse({
-        id,
-        message: 'ok',
-      });
+
+      // find copy to clipboard button
+      const contents = document.querySelectorAll('.markdown.prose.w-full');
+      const content = contents[contents.length - 1];
+      const message = content.innerHTML;
+
+      // get value from clipboard
+      sendResponse(message);
     })();
 
     return true;

@@ -18,11 +18,12 @@ async function doSubmit(event: Event): Promise<void> {
   for (let i = 0, len = store.prompts.length; i < len; i++) {
     currentExecuting.value = i;
     const item = store.prompts[i];
-    const prompt = item.trim();
+    const prompt = item.prompt.trim();
     if (!prompt) continue;
 
-    await setValueToInput(item);
-    await submitPrompt();
+    await setValueToInput(prompt);
+    const response = await submitPrompt();
+    store.setPrompt(i, { response });
   }
   currentExecuting.value = -1;
 }

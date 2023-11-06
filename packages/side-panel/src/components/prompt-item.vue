@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { marked } from 'marked';
 import useStore from '@/store';
 
 type Props = {
@@ -16,11 +17,15 @@ const store = useStore();
 const textarea = ref<HTMLTextAreaElement>();
 const prompt = computed<string>({
   get(): string {
-    return store.prompts[props.index];
+    return store.prompts[props.index].prompt;
   },
   set(value: string): void {
-    store.setPrompts(props.index, value);
+    store.setPrompt(props.index, { prompt: value });
   },
+});
+const markdown = computed<string>(() => {
+  const { response } = store.prompts[props.index];
+  return response ? marked.parse(response) : '';
 });
 
 function doRemove(): void {
@@ -53,10 +58,17 @@ onMounted(() => {
   .flex-1
     textarea.textarea.textarea-bordered.w-full.leading-normal.pt-2(
       ref="textarea"
-      rows="4"
+      rows="3"
       required
       placeholder="Type here"
-      :tabindex="index"
+      :tabindex="index + 1"
       v-model="prompt"
     )
+    .chat.chat-start(
+      v-if="markdown"
+    )
+      .chat-bubble.prose(
+        v-html="markdown"
+      )
+
 </template>
