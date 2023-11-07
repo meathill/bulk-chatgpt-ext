@@ -8,19 +8,17 @@ function sleep(ms: number): Promise<void> {
 
 chrome.runtime.onMessage.addListener(
   function (request: PromptRequest, sender, sendResponse) {
-    console.log(sender.url);
     if (request.type !== 'ExecutePrompt') { return; }
 
     const button = document.querySelector('[data-testid="send-button"]') as HTMLButtonElement;
     button.click();
 
     (async function () {
-      await sleep(1500);
-      const buttons = document.getElementsByTagName('button');
+      await sleep(5000);
       let timeout = 0;
+      const streaming = document.getElementsByClassName('result-streaming');
       while (timeout < 150000) { // 150s
-        const reButton = Array.from(buttons).find((button) => button.innerText === 'Regenerate');
-        if (reButton && !reButton.disabled) {
+        if (streaming.length === 0) {
           break;
         }
         console.log('[MuiBulk content] waiting for regenerate button');
