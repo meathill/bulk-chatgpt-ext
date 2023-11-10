@@ -67,7 +67,7 @@ onMounted(() => {
     .chat.chat-start(
       v-if="markdown"
     )
-      .chat-bubble.prose(
+      .chat-bubble.text-base.prose.text-neutral-content(
         v-html="markdown"
       )
 
