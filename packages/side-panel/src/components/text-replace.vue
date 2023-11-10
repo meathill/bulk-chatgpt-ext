@@ -43,7 +43,7 @@ button.btn(
   :class="buttonClass"
   @click="doOpen"
 )
-  i.bi.bi-arrow-repeat
+  i.bi.bi-textarea-t.text-lg
 teleport(to="body")
   dialog.modal(
     v-if="isOpen"

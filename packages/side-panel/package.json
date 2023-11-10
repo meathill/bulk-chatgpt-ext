@@ -8,7 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "marked": "^9.1.5",
+    "lodash": "^4.17.21",
+    "marked": "^9.1.6",
     "pinia": "^2.1.7",
     "turndown": "^7.1.2",
     "vue": "^3.3.8"
@@ -16,9 +17,9 @@
   "devDependencies": {
     "@crxjs/vite-plugin": "2.0.0-beta.19",
     "@tailwindcss/typography": "^0.5.10",
-    "@types/chrome": "^0.0.249",
-    "@types/turndown": "^5.0.3",
-    "@vitejs/plugin-vue": "^4.4.0",
+    "@types/chrome": "^0.0.251",
+    "@types/turndown": "^5.0.4",
+    "@vitejs/plugin-vue": "^4.4.1",
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.9.4",
     "postcss": "^8.4.31",

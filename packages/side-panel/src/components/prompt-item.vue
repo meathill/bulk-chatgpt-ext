@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { marked } from 'marked';
 import useStore from '@/store';
+import FileUploader from '@/components/file-uploader.vue';
 
 type Props = {
   index: number;
@@ -42,7 +43,7 @@ onMounted(() => {
 </script>
 
 <template lang="pug">
-.flex.gap-2.mb-2
+.flex.gap-2.mt-2
   .w-6.flex-none.pt-1
     .border.rounded-full.w-6.h-6.flex.justify-center.items-center.border-base-content(
       :class="{'bg-base-200': isExecuting}"
@@ -56,15 +57,24 @@ onMounted(() => {
     )
       i.bi.bi-x-lg
   .flex-1
-    textarea.textarea.textarea-bordered.w-full.leading-normal.pt-2(
-      ref="textarea"
-      rows="3"
-      required
-      placeholder="Type here"
-      :tabindex="index + 1"
-      v-model="prompt"
-    )
-    .chat.chat-start(
+    .form-control.relative
+      label.label.sr-only
+        span.label-text Prompt {{index + 1}}
+      textarea.textarea.textarea-bordered.w-full.leading-normal.pt-2(
+        ref="textarea"
+        rows="3"
+        required
+        placeholder="Type here"
+        :tabindex="index + 1"
+        v-model="prompt"
+      )
+      .absolute.flex.items-center.w-32(
+        v-if="!prompt"
+        class="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      )
+        file-uploader(v-model="store.prompts[index].file")
+
+    .chat.chat-start.mt-2(
       v-if="markdown"
     )
       .chat-bubble.text-base.prose.text-neutral-content(

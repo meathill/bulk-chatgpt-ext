@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { PromptItem } from '@/types';
+import defaults from 'lodash/defaults';
+import { AppConfig, PromptItem } from '@/types';
 
+const LOCAL_CONFIG = 'local_config';
 const LOCAL_KEY = 'local-prompts';
 
 function createItem(): PromptItem {
@@ -14,6 +16,11 @@ function createItem(): PromptItem {
 const useStore = defineStore('store', () => {
   const local = localStorage.getItem(LOCAL_KEY);
   const prompts = ref<PromptItem[]>(local ? JSON.parse(local) : [createItem()]);
+  const localConfig = localStorage.getItem(LOCAL_CONFIG);
+  const config = ref<AppConfig>(defaults(localConfig ? JSON.parse(localConfig) : {}, {
+    hasPrefix: false,
+    prefix: '',
+  }));
 
   function addPrompt(): void {
     prompts.value.push(createItem());
@@ -39,8 +46,12 @@ const useStore = defineStore('store', () => {
     a.click();
     URL.revokeObjectURL(url);
   }
+  function setConfig(value: Partial<AppConfig>) {
+    Object.assign(config.value, value);
+  }
 
   return {
+    config,
     prompts,
 
     addPrompt,
@@ -48,6 +59,7 @@ const useStore = defineStore('store', () => {
     removePrompt,
     setPrompt,
     exportData,
+    setConfig,
   };
 });
 

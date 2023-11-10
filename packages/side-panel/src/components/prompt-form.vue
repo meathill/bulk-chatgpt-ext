@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { setValueToInput, submitPrompt } from '../services';
 import PromptItem from '@/components/prompt-item.vue';
 import useStore from '@/store';
@@ -7,6 +7,14 @@ import useStore from '@/store';
 const store = useStore();
 const promptItems = ref<typeof PromptItem>();
 const currentExecuting = ref<number>(-1);
+const prefix = computed<string>({
+  get(): string {
+    return store.config.prefix;
+  },
+  set(value: string) {
+    store.setConfig({ prefix: value });
+  },
+});
 
 async function doAddPrompt(): Promise<void> {
   store.addPrompt();
@@ -34,9 +42,19 @@ function doClearAll(): void {
 </script>
 
 <template lang="pug">
-form.px-4.pt-4(
+form.px-4.pt-2(
   @submit.prevent="doSubmit"
 )
+  .form-control.mb-4(
+    v-if="store.config.hasPrefix"
+  )
+    label.label
+      span.label-text Prefix
+    textarea.textarea.textarea-bordered(
+      placeholder="Prefix will be prepended to each prompt"
+      rows="4"
+      v-model="prefix"
+    )
   prompt-item(
     v-for="(item, index) in store.prompts"
     ref="promptItems"
@@ -45,14 +63,14 @@ form.px-4.pt-4(
     :is-executing="currentExecuting === index"
     @delete="store.removePrompt(index)"
   )
-  .flex.gap-2.mb-2
-    button.btn.btn-sm.btn-outline.ml-8.mb-2(
+  .flex.gap-2.my-4
+    button.btn.btn-sm.btn-outline.ml-8(
       type="button"
       @click="doAddPrompt"
     )
       i.bi.bi-plus-lg
       | Add prompt
-    button.btn.btn-sm.btn-outline.ml-auto.mb-2(
+    button.btn.btn-sm.btn-outline.ml-auto(
       type="button"
       @click="doClearAll"
     )
