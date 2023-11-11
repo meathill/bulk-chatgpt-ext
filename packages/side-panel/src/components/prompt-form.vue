@@ -44,7 +44,8 @@ async function doSubmit(event: Event): Promise<void> {
 ${prompt}
 \`\`\`
 `);
-        const response = await submitPrompt();
+        let response = await submitPrompt();
+        response = response.replace(/\\(?![tnbrfv0])/g, '');
         console.log('response:', response);
         chunks.setChunk(response);
         store.setPrompt(i, { progress: chunks.progress });

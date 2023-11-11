@@ -32,6 +32,7 @@ chrome.runtime.onMessage.addListener(
         .replace(/jsonCopy code/g, '');
 
       // get value from clipboard
+      console.log('[MuiBulk content]', message);
       sendResponse(message);
     })();
 

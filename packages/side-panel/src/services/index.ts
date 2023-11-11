@@ -1,7 +1,4 @@
-import TurndownService from 'turndown';
-import {sleep} from "@/utils";
-
-const turndownService = new TurndownService();
+import { sleep } from '@/utils';
 
 function setValueToTextarea(selector: string, value: string): void {
   const textarea = document.querySelector(selector) as HTMLTextAreaElement;
@@ -10,7 +7,6 @@ function setValueToTextarea(selector: string, value: string): void {
   textarea.value = value;
   const event = new Event('input', { bubbles: true });
   textarea.dispatchEvent(event);
-  console.log('[MuiBulk] setValueToTextarea', value, textarea.value);
 }
 
 export async function getActiveTab(): Promise<chrome.tabs.Tab> {
@@ -28,7 +24,7 @@ export async function setValueToInput(value: string): Promise<void> {
     func: setValueToTextarea,
     args: ['#prompt-textarea', value],
   });
-  await sleep(500);
+  await sleep(1000);
 }
 
 export async function submitPrompt(): Promise<string> {
@@ -36,5 +32,5 @@ export async function submitPrompt(): Promise<string> {
   const result = await chrome.tabs.sendMessage(tab.id as number, {
     type: 'ExecutePrompt',
   });
-  return turndownService.turndown(result as string);
+  return result as string;
 }

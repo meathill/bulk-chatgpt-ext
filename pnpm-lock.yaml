@@ -35,9 +35,6 @@ importers:
       pinia:
         specifier: ^2.1.7
         version: 2.1.7(typescript@5.2.2)(vue@3.3.8)
-      turndown:
-        specifier: ^7.1.2
-        version: 7.1.2
       vue:
         specifier: ^3.3.8
         version: 3.3.8(typescript@5.2.2)
@@ -54,9 +51,6 @@ importers:
       '@types/lodash':
         specifier: ^4.14.201
         version: 4.14.201
-      '@types/turndown':
-        specifier: ^5.0.4
-        version: 5.0.4
       '@vitejs/plugin-vue':
         specifier: ^4.4.1
         version: 4.4.1(vite@4.5.0)(vue@3.3.8)
@@ -499,10 +493,6 @@ packages:
 
   /@types/semver@7.5.5:
     resolution: {integrity: sha512-+d+WYC1BxJ6yVOgUgzK8gWvp5qF8ssV5r4nsDcZWKRWcDQLQ619tvWAxJQYGgBrO1MnLJC7a5GtiYsAoQ47dJg==}
-    dev: true
-
-  /@types/turndown@5.0.4:
-    resolution: {integrity: sha512-28GI33lCCkU4SGH1GvjDhFgOVr+Tym4PXGBIU1buJUa6xQolniPArtUT+kv42RR2N9MsMLInkr904Aq+ESHBJg==}
     dev: true
 
   /@typescript-eslint/eslint-plugin@6.10.0(@typescript-eslint/parser@6.10.0)(eslint@8.53.0)(typescript@5.2.2):
@@ -1179,10 +1169,6 @@ packages:
     dependencies:
       domelementtype: 2.3.0
     dev: true
-
-  /domino@2.1.6:
-    resolution: {integrity: sha512-3VdM/SXBZX2omc9JF9nOPCtDaYQ67BGp5CoLpIQlO2KCAPETs8TcDHacF26jXadGbvUteZzRTeos2fhID5+ucQ==}
-    dev: false
 
   /domutils@3.1.0:
     resolution: {integrity: sha512-H78uMmQtI2AhgDJjWeQmHwJJ2bLPD3GMmO7Zja/ZZh84wkm+4ut+IUnUdRa8uCGX88DiVx1j6FRe1XfxEgjEZA==}
@@ -2422,12 +2408,6 @@ packages:
   /tslib@2.6.2:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: true
-
-  /turndown@7.1.2:
-    resolution: {integrity: sha512-ntI9R7fcUKjqBP6QU8rBK2Ehyt8LAzt3UBT9JR9tgo6GtuKvyUzpayWmeMKJw1DPdXzktvtIT8m2mVXz+bL/Qg==}
-    dependencies:
-      domino: 2.1.6
-    dev: false
 
   /type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
