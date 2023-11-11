@@ -32,11 +32,18 @@ const useStore = defineStore('store', () => {
   }
   function removePrompt(index: number): void {
     prompts.value.splice(index, 1);
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(prompts.value));
+    savePromptList();
   }
   function setPrompt(index: number, prompt: Partial<PromptItem>): void {
     Object.assign(prompts.value[index], prompt);
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(prompts.value));
+    savePromptList();
+  }
+  function savePromptList(): void {
+    const list= prompts.value.map((item) => ({
+      prompt: item.prompt,
+      response: item.response,
+    }));
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
   }
   async function exportData(): Promise<void> {
     const blob = new Blob([JSON.stringify(prompts.value)], { type: 'application/json' });
