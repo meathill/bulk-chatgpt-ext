@@ -13,16 +13,22 @@ export class JsonChunks {
   #progress = 0;
 
   constructor(json: string) {
-    this.#total = json.length;
     this.#root = JSON.parse(json);
+    // calculate total size without whitespaces
+    this.#total = JSON.stringify(this.#root).length;
 
     const chunks: unknown[] = [this.#root];
     const keys: string[][] = [];
     while (chunks.length) {
       const chunk = chunks.shift();
       const key = keys.shift() as string[] || [];
-      const string = isString(chunk) || isNumber(chunk)
-        ? (chunk as string) : JSON.stringify(chunk);
+      if (isString(chunk) || isNumber(chunk)) {
+        this.#queue.push(chunk);
+        this.#keys.push(key);
+        continue;
+      }
+
+      const string = JSON.stringify(chunk);
       // enough for one chunk, save it into queue
       if (string.length < MAX_CHUNK_SIZE) {
         this.#queue.push(chunk);
@@ -61,6 +67,12 @@ export class JsonChunks {
   }
 
   setChunk<T extends object>(obj: unknown) {
+    obj = isString(obj) ? JSON.parse(obj) : obj;
+    if (this.#path.length === 0) {
+      this.#root = obj;
+      return;
+    }
+
     let target: T = this.#root as T;
     for (const key of this.#path.slice(0, -1)) {
       if (!(key in target)) {

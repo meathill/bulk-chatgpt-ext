@@ -1,4 +1,5 @@
 import TurndownService from 'turndown';
+import {sleep} from "@/utils";
 
 const turndownService = new TurndownService();
 
@@ -27,6 +28,7 @@ export async function setValueToInput(value: string): Promise<void> {
     func: setValueToTextarea,
     args: ['#prompt-textarea', value],
   });
+  await sleep(500);
 }
 
 export async function submitPrompt(): Promise<string> {

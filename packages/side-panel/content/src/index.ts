@@ -1,10 +1,7 @@
 import { PromptRequest } from '../../src/types';
+import { sleep } from '../../src/utils';
 
 console.log('[MuiBulk content] init');
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 chrome.runtime.onMessage.addListener(
   function (request: PromptRequest, sender, sendResponse) {
@@ -16,8 +13,8 @@ chrome.runtime.onMessage.addListener(
     (async function () {
       await sleep(5000);
       let timeout = 0;
-      const streaming = document.getElementsByClassName('result-streaming');
       while (timeout < 150000) { // 150s
+        const streaming = document.getElementsByClassName('result-streaming');
         if (streaming.length === 0) {
           break;
         }
@@ -31,7 +28,8 @@ chrome.runtime.onMessage.addListener(
       // find copy to clipboard button
       const contents = document.querySelectorAll('.markdown.prose.w-full');
       const content = contents[contents.length - 1];
-      const message = content.innerHTML;
+      const message = content.textContent
+        .replace(/jsonCopy code/g, '');
 
       // get value from clipboard
       sendResponse(message);

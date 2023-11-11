@@ -5,6 +5,7 @@ import { setValueToInput, submitPrompt } from '../services';
 import PromptItem from '@/components/prompt-item.vue';
 import useStore from '@/store';
 import { JsonChunks } from '@/utils/json-chunks.ts';
+import { sleep } from '@/utils';
 
 const store = useStore();
 const promptItems = ref<typeof PromptItem>();
@@ -37,13 +38,20 @@ async function doSubmit(event: Event): Promise<void> {
       const chunks = new JsonChunks(item.fileContent);
       while (!chunks.done) {
         const prompt = chunks.getChunk();
-        await setValueToInput(store.config.prefix + prompt);
+        await setValueToInput(`${store.config.prefix}
+
+\`\`\`json
+${prompt}
+\`\`\`
+`);
         const response = await submitPrompt();
+        console.log('response:', response);
         chunks.setChunk(response);
         store.setPrompt(i, { progress: chunks.progress });
       }
       store.setPrompt(i, { response: chunks.result });
     }
+    await sleep(Math.random() * 3000 + 1000);
   }
   currentExecuting.value = -1;
 }
