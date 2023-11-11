@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import cloneDeep from 'lodash/cloneDeep';
 import { setValueToInput, submitPrompt } from '../services';
 import PromptItem from '@/components/prompt-item.vue';
 import useStore from '@/store';
+import { JsonChunks } from '@/utils/json-chunks.ts';
 
 const store = useStore();
 const promptItems = ref<typeof PromptItem>();
@@ -27,11 +29,21 @@ async function doSubmit(event: Event): Promise<void> {
     currentExecuting.value = i;
     const item = store.prompts[i];
     const prompt = item.prompt.trim();
-    if (!prompt) continue;
-
-    await setValueToInput(prompt);
-    const response = await submitPrompt();
-    store.setPrompt(i, { response });
+    if (prompt) {
+      await setValueToInput(prompt);
+      const response = await submitPrompt();
+      store.setPrompt(i, { response });
+    } else if (item.fileContent) {
+      const chunks = new JsonChunks(item.fileContent);
+      while (!chunks.done) {
+        const prompt = chunks.getChunk();
+        await setValueToInput(store.config.prefix + prompt);
+        const response = await submitPrompt();
+        chunks.setChunk(response);
+        store.setPrompt(i, { progress: chunks.progress });
+      }
+      store.setPrompt(i, { response: chunks.result });
+    }
   }
   currentExecuting.value = -1;
 }

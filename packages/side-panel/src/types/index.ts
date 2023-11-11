@@ -9,6 +9,7 @@ export type PromptItem = {
   response: string;
   file?: File;
   fileContent?: string;
+  progress?: number;
 }
 
 export type PromptRequest = {

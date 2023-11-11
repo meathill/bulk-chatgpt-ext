@@ -10,6 +10,7 @@ function createItem(): PromptItem {
   return {
     prompt: '',
     response: '',
+    progress: 0,
   };
 }
 
@@ -48,6 +49,7 @@ const useStore = defineStore('store', () => {
   }
   function setConfig(value: Partial<AppConfig>) {
     Object.assign(config.value, value);
+    localStorage.setItem(LOCAL_CONFIG, JSON.stringify(config.value));
   }
 
   return {

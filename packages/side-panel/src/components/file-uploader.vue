@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { readFile } from '@/services/file-reader';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 type Props = {
-  modelValue: string;
-  accept: string;
+  file: File,
+  content: string;
+  accept?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
   accept: 'application/json',
-  modelValue: '',
+  content: '',
 });
 type Emits = {
-  (event: 'update:modelValue', value: string): void;
+  (event: 'update:content', value: string): void;
+  (event: 'update:file', value: File): void;
 };
 const emit = defineEmits<Emits>();
 
@@ -19,15 +21,22 @@ const fileName = ref<string>('');
 const fileSize = ref<number>(0);
 
 async function onSelectFile(event: Event): Promise<void> {
-  const files = (event.target as HTMLInputElement)?.files;
-  if (!files || files.length === 0) return;
+  const target = event.target as HTMLInputElement;
+  const file = target.files && target.files[0];
+  if (!file) return;
 
-  const file = files[0];
+  target.value = '';
   fileName.value = file.name;
   fileSize.value = file.size;
   const content = await readFile(file);
-  emit('update:modelValue', content);
+  emit('update:file', file);
+  emit('update:content', content);
 }
+
+watch(() => props.file, (file) => {
+  fileName.value = file ? file.name : '';
+  fileSize.value = file ? file.size : 0;
+});
 </script>
 
 <template lang="pug">
