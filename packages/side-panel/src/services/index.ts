@@ -1,4 +1,5 @@
 import { sleep } from '@/utils';
+import { PromptResponse } from '@/types';
 
 function setValueToTextarea(selector: string, value: string): void {
   const textarea = document.querySelector(selector) as HTMLTextAreaElement;
@@ -29,8 +30,11 @@ export async function setValueToInput(value: string): Promise<void> {
 
 export async function submitPrompt(): Promise<string> {
   const tab = await getActiveTab();
-  const result = await chrome.tabs.sendMessage(tab.id as number, {
+  const result = (await chrome.tabs.sendMessage(tab.id as number, {
     type: 'ExecutePrompt',
-  });
-  return result as string;
+  })) as PromptResponse;
+  if (result.code !== 0) {
+    throw new Error(result.error);
+  }
+  return result.data;
 }

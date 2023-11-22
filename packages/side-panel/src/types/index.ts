@@ -10,8 +10,17 @@ export type PromptItem = {
   file?: File;
   fileContent?: string;
   progress?: number;
+  enabled?: boolean;
+  success?: boolean;
+  error?: string;
 }
 
 export type PromptRequest = {
   type: 'ExecutePrompt';
+}
+
+export type PromptResponse = {
+  code: number;
+  data: string;
+  error?: string;
 }

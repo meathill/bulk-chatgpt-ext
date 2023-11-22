@@ -3,10 +3,12 @@ import { computed, onMounted, ref, shallowRef } from 'vue';
 import { marked } from 'marked';
 import useStore from '@/store';
 import FileUploader from '@/components/file-uploader.vue';
+import type { PromptItem } from '@/types';
 
 type Props = {
   index: number;
   isExecuting?: boolean;
+  item?: PromptItem;
 };
 const props = defineProps<Props>();
 type Emits = {
@@ -55,9 +57,10 @@ onMounted(() => {
 .flex.gap-2.mt-2
   .w-6.flex-none.pt-1
     .border.rounded-full.w-6.h-6.flex.justify-center.items-center.border-base-content(
-      :class="{'bg-base-200': isExecuting}"
+      :class="item.success ? 'bg-success' : (isExecuting && 'bg-base-200')"
     )
-      i.bi.bi-play-fill(v-if="isExecuting")
+      i.bi.bi-check-lg(v-if="item.success")
+      i.bi.bi-play-fill(v-else-if="isExecuting")
       template(v-else) {{index + 1}}
     button.btn.btn-xs.btn-ghost.btn-circle.mt-2(
       tabindex="-1"
@@ -66,6 +69,8 @@ onMounted(() => {
     )
       i.bi.bi-x-lg
   .flex-1.relative
+    .alert.alert-error(v-if="item.error")
+      p {{item.error}}
     .border.rounded-box.p-4(v-if="file")
       progress.progress.progress-primary.w-full.mb-2(
         :value="store.prompts[props.index].progress || 0"
