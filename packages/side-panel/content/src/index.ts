@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener(
         timeout += 1;
       }
 
-      await sleep(5000);
+      await sleep(4000 + Math.random() * 2000);
 
       // wait for generating complete
       timeout = 0;

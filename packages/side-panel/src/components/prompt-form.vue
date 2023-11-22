@@ -26,24 +26,27 @@ async function doSubmit(event: Event): Promise<void> {
   if ((event.target as HTMLFormElement).matches(':invalid')) return;
   if (currentExecuting.value > -1) return;
 
+  const _prefix = prefix.value.trim();
   for (let i = 0, len = store.prompts.length; i < len; i++) {
     currentExecuting.value = i;
     const item = store.prompts[i];
     const prompt = item.prompt.trim();
     if (prompt) {
-      await setValueToInput(prompt);
+      await setValueToInput(_prefix ? `${_prefix}
+
+${prompt}` : prompt);
       const response = await submitPrompt();
       store.setPrompt(i, { response });
     } else if (item.fileContent) {
       const chunks = new JsonChunks(item.fileContent);
       while (!chunks.done) {
         const prompt = chunks.getChunk();
-        await setValueToInput(`${store.config.prefix}
+        await setValueToInput(_prefix ? `${_prefix}
 
 \`\`\`json
 ${prompt}
 \`\`\`
-`);
+` : prompt);
         let response = await submitPrompt();
         response = response.replace(/\\(?![tnbrfv0])/g, '');
         console.log('response:', response);
