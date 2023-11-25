@@ -1,11 +1,12 @@
 import isString from 'lodash/isString';
 import isNumber from 'lodash/isNumber';
+import { createFileUrl } from '@/utils/index.ts';
 
 const MAX_CHUNK_SIZE = 2048;
 
 export class JsonChunks {
   #done = false;
-  #root: unknown;
+  #root: Record<string, unknown>;
   #chunks: Record<string, string | boolean | number>[] = [];
   #total = 0;
   #progress = 0;
@@ -46,7 +47,6 @@ export class JsonChunks {
         keys.push(key ? `${key}.${k}` : k);
       }
     }
-    this.#total = Object.keys(map).length;
 
     // then, split map into chunks
     const chunks = [];
@@ -64,6 +64,7 @@ export class JsonChunks {
         chunks.push({ [k]: v });
       }
     }
+    this.#total = chunks.length;
     this.#chunks = chunks;
   }
 
@@ -73,8 +74,14 @@ export class JsonChunks {
   get result() {
     return JSON.stringify(this.#root);
   }
+  get url(): string {
+    return createFileUrl(this.result);
+  }
+  get total(): number {
+    return this.#total;
+  }
   get progress(): number {
-    return this.#progress / this.#total;
+    return this.#progress;
   }
 
   getChunk(): string {
@@ -84,16 +91,18 @@ export class JsonChunks {
 
     const chunk = this.#chunks.shift();
     this.#progress++;
+    this.#done = this.#progress >= this.#total;
     return JSON.stringify(chunk);
   }
 
-  setChunk(obj: Record<string, string>) {
+  setChunk(result: Record<string, string> | string) {
+    const obj = isString(result) ? JSON.parse(result) : result;
     for (const [k, v] of Object.entries(obj)) {
       const keys = k.split('.');
       let target = this.#root;
       while (keys.length > 1) {
         const key = keys.shift() as string;
-        target = target[key];
+        target = target[key] as Record<string, unknown>;
       }
       target[keys[0]] = v;
     }

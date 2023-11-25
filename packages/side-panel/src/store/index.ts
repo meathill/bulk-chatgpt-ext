@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import defaults from 'lodash/defaults';
 import { AppConfig, PromptItem } from '@/types';
+import { createFileUrl } from '@/utils';
 
 const LOCAL_CONFIG = 'local_config';
 const LOCAL_KEY = 'local-prompts';
@@ -11,12 +12,29 @@ function createItem(): PromptItem {
     prompt: '',
     response: '',
     progress: 0,
+    total: 0,
   };
+}
+
+function handleLocalPromptList(local: string): PromptItem[] {
+  const prompts = JSON.parse(local) as PromptItem[];
+  return prompts.map((item: PromptItem) => {
+    const { isFile, response } = item;
+    let url = '';
+    if (isFile) {
+      url = createFileUrl(response as string);
+    }
+    return {
+      ...item,
+      url,
+      isFile,
+    };
+  });
 }
 
 const useStore = defineStore('store', () => {
   const local = localStorage.getItem(LOCAL_KEY);
-  const prompts = ref<PromptItem[]>(local ? JSON.parse(local) : [createItem()]);
+  const prompts = ref<PromptItem[]>(local ? handleLocalPromptList(local) : [createItem()]);
   const localConfig = localStorage.getItem(LOCAL_CONFIG);
   const config = ref<AppConfig>(defaults(localConfig ? JSON.parse(localConfig) : {}, {
     hasPrefix: false,
@@ -41,13 +59,14 @@ const useStore = defineStore('store', () => {
   function savePromptList(): void {
     const list= prompts.value.map((item) => ({
       prompt: item.prompt,
+      isFile: item.file ? 1 : 0,
+      isSuccess: item.success ? 1 : 0,
       response: item.response,
     }));
     localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
   }
   async function exportData(): Promise<void> {
-    const blob = new Blob([JSON.stringify(prompts.value)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+    const url = createFileUrl(JSON.stringify(prompts.value));
     const a = document.createElement('a');
     a.href = url;
     a.download = 'mui-bulk-exported.json';

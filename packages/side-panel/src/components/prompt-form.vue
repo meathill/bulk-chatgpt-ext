@@ -40,10 +40,14 @@ async function doSubmit(event: Event): Promise<void> {
 ${prompt}` : prompt);
         const response = await submitPrompt();
         store.setPrompt(i, { response });
+
       } else if (item.fileContent) {
         const chunks = new JsonChunks(item.fileContent);
+        store.setPrompt(i, { total: chunks.total });
         while (!chunks.done) {
           const prompt = chunks.getChunk();
+          if (!prompt) break;
+
           await setValueToInput(_prefix ? `${_prefix}
 
 \`\`\`json
@@ -56,14 +60,18 @@ ${prompt}
           chunks.setChunk(response);
           store.setPrompt(i, { progress: chunks.progress });
         }
-        store.setPrompt(i, { response: chunks.result });
+        store.setPrompt(i, {
+          response: chunks.result,
+          url: chunks.url,
+        });
       }
+
     } catch (e) {
       message.value = (e as Error).message || String(e);
       break;
     }
 
-    item.success = true;
+    store.setPrompt(i, { success: true });
     await sleep(Math.random() * 3000 + 1000);
   }
   currentExecuting.value = -1;
