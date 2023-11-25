@@ -1,6 +1,6 @@
 {
   "name": "bulk-chatgpt",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,23 +9,23 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "marked": "^9.1.6",
+    "marked": "^10.0.0",
     "pinia": "^2.1.7",
-    "vue": "^3.3.8"
+    "vue": "^3.3.9"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "2.0.0-beta.19",
     "@tailwindcss/typography": "^0.5.10",
-    "@types/chrome": "^0.0.251",
-    "@types/lodash": "^4.14.201",
-    "@vitejs/plugin-vue": "^4.4.1",
+    "@types/chrome": "^0.0.253",
+    "@types/lodash": "^4.14.202",
+    "@vitejs/plugin-vue": "^4.5.0",
     "autoprefixer": "^10.4.16",
-    "daisyui": "^3.9.4",
+    "daisyui": "^4.4.6",
     "postcss": "^8.4.31",
     "pug": "^3.0.2",
     "tailwindcss": "^3.3.5",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.0",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.2",
     "vue-tsc": "^1.8.22"
   }
 }

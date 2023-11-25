@@ -1,47 +1,71 @@
 import isString from 'lodash/isString';
 import isNumber from 'lodash/isNumber';
+import { createFileUrl } from '@/utils/index.ts';
 
-const MAX_CHUNK_SIZE = 1024;
+const MAX_CHUNK_SIZE = 2048;
 
 export class JsonChunks {
   #done = false;
-  #root: unknown;
-  #queue: unknown[] = [];
-  #keys: string[][] = [];
-  #path: string[] = [];
+  #root: Record<string, unknown>;
+  #chunks: Record<string, string | boolean | number>[] = [];
   #total = 0;
   #progress = 0;
 
   constructor(json: string) {
     this.#root = JSON.parse(json);
     // calculate total size without whitespaces
-    this.#total = JSON.stringify(this.#root).length;
 
-    const chunks: unknown[] = [this.#root];
-    const keys: string[][] = [];
-    while (chunks.length) {
-      const chunk = chunks.shift();
-      const key = keys.shift() as string[] || [];
-      if (isString(chunk) || isNumber(chunk)) {
-        this.#queue.push(chunk);
-        this.#keys.push(key);
-        continue;
-      }
-
-      const string = JSON.stringify(chunk);
-      // enough for one chunk, save it into queue
-      if (string.length < MAX_CHUNK_SIZE) {
-        this.#queue.push(chunk);
-        this.#keys.push(key);
+    // first, make a flattened object
+    // ```js
+    // const from = {
+    //   a: 123,
+    //   b: {
+    //     c: 'bar',
+    //     d: false,
+    //   }
+    // }
+    // const transformed = {
+    //   a: 123,
+    //   'b.c': 'bar',
+    //   'b.d': false,
+    // }
+    // ```
+    const queue: unknown[] = [this.#root];
+    const keys: string[] = [];
+    const map: Record<string, number | string | boolean> = {};
+    while (queue.length) {
+      const value = queue.shift();
+      const key = keys.shift() as string || '';
+      if (isString(value) || isNumber(value) || typeof value === 'boolean') {
+        map[key] = value;
         continue;
       }
 
       // need to split into smaller chunks
-      for (const [k, v] of Object.entries(chunk as object)) {
-        chunks.push(v);
-        keys.push([...key, k]);
+      for (const [k, v] of Object.entries(value as object)) {
+        queue.push(v);
+        keys.push(key ? `${key}.${k}` : k);
       }
     }
+
+    // then, split map into chunks
+    const chunks = [];
+    for (const [k, v] of Object.entries(map)) {
+      const length = k.length + v.toString().length + 5;
+      let isPushed = false;
+      for (const chunk of chunks) {
+        if (JSON.stringify(chunk).length + length < MAX_CHUNK_SIZE) {
+          chunk[k] = v;
+          isPushed = true;
+          break;
+        }
+      }
+      if (!isPushed) {
+        chunks.push({ [k]: v });
+      }
+    }
+    this.#total = chunks.length;
+    this.#chunks = chunks;
   }
 
   get done() {
@@ -50,8 +74,14 @@ export class JsonChunks {
   get result() {
     return JSON.stringify(this.#root);
   }
+  get url(): string {
+    return createFileUrl(this.result);
+  }
+  get total(): number {
+    return this.#total;
+  }
   get progress(): number {
-    return this.#progress / this.#total;
+    return this.#progress;
   }
 
   getChunk(): string {
@@ -59,27 +89,22 @@ export class JsonChunks {
       return '';
     }
 
-    const chunk = JSON.stringify(this.#queue.shift());
-    this.#path = this.#keys.shift() as string[] || [];
-    this.#done = this.#queue.length <= 0;
-    this.#progress = this.#progress + chunk.length;
-    return chunk;
+    const chunk = this.#chunks.shift();
+    this.#progress++;
+    this.#done = this.#progress >= this.#total;
+    return JSON.stringify(chunk);
   }
 
-  setChunk<T extends object>(obj: unknown) {
-    obj = isString(obj) ? JSON.parse(obj) : obj;
-    if (this.#path.length === 0) {
-      this.#root = obj;
-      return;
-    }
-
-    let target: T = this.#root as T;
-    for (const key of this.#path.slice(0, -1)) {
-      if (!(key in target)) {
-        throw new Error('Invalid Path');
+  setChunk(result: Record<string, string> | string) {
+    const obj = isString(result) ? JSON.parse(result) : result;
+    for (const [k, v] of Object.entries(obj)) {
+      const keys = k.split('.');
+      let target = this.#root;
+      while (keys.length > 1) {
+        const key = keys.shift() as string;
+        target = target[key] as Record<string, unknown>;
       }
-      target = target[key as keyof T] as T;
+      target[keys[0]] = v;
     }
-    target[this.#path[this.#path.length - 1] as keyof T] = obj as T[keyof T];
   }
 }
