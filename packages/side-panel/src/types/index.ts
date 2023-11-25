@@ -7,7 +7,6 @@ export type PromptItem = {
   id?: string;
   prompt: string;
   response: string;
-  file?: File;
   fileContent?: string;
   url?: string;
   progress?: number;

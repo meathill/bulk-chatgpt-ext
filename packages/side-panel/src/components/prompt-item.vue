@@ -42,8 +42,8 @@ const markdown = computed<string>(() => {
 const resultFile = computed<string>(() => {
   if (!file.value) return '';
   const names = file.value.name.split('.');
-  const ext = names.pop();
-  return `${names.slice(0, -1).join('.')}.result.${ext}`;
+  names.splice(-1, 0, 'result');
+  return names.join('.');
 });
 
 function doRemove(): void {

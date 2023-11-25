@@ -59,7 +59,7 @@ const useStore = defineStore('store', () => {
   function savePromptList(): void {
     const list= prompts.value.map((item) => ({
       prompt: item.prompt,
-      isFile: item.file ? 1 : 0,
+      isFile: item.fileContent ? 1 : 0,
       isSuccess: item.success ? 1 : 0,
       response: item.response,
     }));
