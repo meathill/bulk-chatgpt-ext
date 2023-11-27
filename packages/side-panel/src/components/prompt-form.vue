@@ -54,8 +54,9 @@ ${prompt}` : prompt);
 ${prompt}
 \`\`\`
 ` : prompt);
-          let response = await submitPrompt();
-          response = response.replace(/\\(?![tnbrfv0])/g, '');
+          const response = await submitPrompt();
+          // I forgot why I should replace \{char}, but for now it should not be needed
+          //response = response.replace(/\\(?![tnbrfv0])/g, '');
           console.log('response:', response);
           chunks.setChunk(response);
           store.setPrompt(i, { progress: chunks.progress });
