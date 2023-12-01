@@ -89,6 +89,7 @@ async function doRequest(sendResponse) {
 
       // make sure "Continue generate" button does not exist
       await sleep(1000 + Math.random() * 1000);
+      const buttons = document.getElementsByTagName('button');
       const continueButton = Array.from(buttons).find(button => button.textContent === 'Continue generate');
       if (continueButton) {
         continueButton.click();
